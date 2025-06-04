@@ -22,16 +22,16 @@ connectDB()
 app.use(helmet())
 app.use(
   cors({
-    origin: [
-      process.env.FRONTEND_URL || "http://localhost:8080",
+    origin: process.env.FRONTEND_URL || [
+      "http://localhost:8080",
       "http://127.0.0.1:5500",
-      "http://localhost:5500",
+      "http://localhost:5500", 
       "http://127.0.0.1:8080",
-      "http://localhost:3000",
+      "http://localhost:3000"
     ],
-    credentials: true,
-  }),
-)
+    credentials: true
+  })
+);
 app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true }))
 
@@ -44,6 +44,20 @@ const limiter = rateLimit({
 app.use("/api/", limiter)
 
 // Routes
+// Root route
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to the Hospital Backend API",
+    endpoints: {
+      auth: "/api/auth",
+      dashboard: "/api/dashboard",
+      appointments: "/api/appointments",
+      contact: "/api/contact",
+      utility: "/api"
+    },
+    healthCheck: "/api/health"
+  });
+});
 app.use("/api/auth", authRoutes)
 app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/appointments", appointmentRoutes)
