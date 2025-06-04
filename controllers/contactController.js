@@ -1,48 +1,52 @@
 const Contact = require("../models/Contact")
 const { sendContactConfirmation, sendContactNotification } = require("../utils/emailTemplates")
 const { sendEmail } = require("../utils/sendEmail")
+const { validateContact } = require("./validation");
 
 
 // @route   POST /api/contact
 // @access  Public
-const createContact = async (req, res, next) => {
-  try {
-    const contactData = req.body
+const createContact = [
+  validateContact, // Add validation middleware
+  async (req, res, next) => {
+    try {
+      const contactData = req.body;
 
-    // Create new contact message
-    const contact = new Contact(contactData)
-    await contact.save()
+      // Create new contact message
+      const contact = new Contact(contactData);
+      await contact.save();
 
-    // Send confirmation email to sender
-    const confirmationEmailHtml = sendContactConfirmation(contact)
-    await sendEmail(
-      contact.email,
-      "Message Received - MediCare Hospital",
-      confirmationEmailHtml,
-      "Thank you for contacting MediCare Hospital. We will respond soon.",
-    )
+      // Send confirmation email to sender
+      const confirmationEmailHtml = sendContactConfirmation(contact);
+      await sendEmail(
+        contact.email,
+        "Message Received - MediCare Hospital",
+        confirmationEmailHtml,
+        "Thank you for contacting MediCare Hospital. We will respond soon.",
+      );
 
-    // Send notification email to hospital
-    const notificationEmailHtml = sendContactNotification(contact)
-    await sendEmail(
-      process.env.HOSPITAL_EMAIL || "info@medicarehospital.com",
-      "New Contact Form Submission",
-      notificationEmailHtml,
-      `New contact: ${contact.fullName} - ${contact.subject}`,
-    )
+      // Send notification email to hospital
+      const notificationEmailHtml = sendContactNotification(contact);
+      await sendEmail(
+        process.env.HOSPITAL_EMAIL || "info@medicarehospital.com",
+        "New Contact Form Submission",
+        notificationEmailHtml,
+        `New contact: ${contact.fullName} - ${contact.subject}`,
+      );
 
-    res.status(201).json({
-      success: true,
-      message: "Message sent successfully",
-      data: {
-        contactId: contact._id,
-        subject: contact.subject,
-      },
-    })
-  } catch (error) {
-    next(error)
+      res.status(201).json({
+        success: true,
+        message: "Message sent successfully",
+        data: {
+          contactId: contact._id,
+          subject: contact.subject,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-}
+];
 
 
 // @route   GET /api/contact

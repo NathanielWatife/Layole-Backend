@@ -7,12 +7,10 @@ const {
   deleteContact,
   getContactStats,
 } = require("../controllers/contactController")
-const { validateContact } = require("../middleware/validation")
-
 const router = express.Router()
 
 // Public routes
-router.post("/", validateContact, createContact)
+router.post("/", createContact)
 
 // Admin routes (would need authentication middleware in production)
 router.get("/", getContacts)
