@@ -1,6 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
+const rateLimit = require("express-rate-limit")
 require("dotenv").config()
 
 const connectDB = require("./config/db")
@@ -8,50 +9,59 @@ const appointmentRoutes = require("./routes/appointmentRoutes")
 const contactRoutes = require("./routes/contactRoutes")
 const authRoutes = require("./routes/authRoutes")
 const dashboardRoutes = require("./routes/dashboardRoutes")
+const utilityRoutes = require("./routes/utilityRoutes")
 const errorHandler = require("./middleware/errorHandler")
-
 
 const app = express()
 const PORT = process.env.PORT || 3000
-// connect to databse
+
+// Connect to database
 connectDB()
 
-// middleware
+// Middleware
 app.use(helmet())
 app.use(
-    cors({
-        origins: [
-            process.env.FRONTEND_URL
-        ].filter(Boolean),
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true,
-    }),
+  cors({
+    origin: [
+      process.env.FRONTEND_URL || "http://localhost:8080",
+      "http://127.0.0.1:5500",
+      "http://localhost:5500",
+      "http://127.0.0.1:8080",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+  }),
 )
-
-
-app.use(express.json())
+app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true }))
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+})
+app.use("/api/", limiter)
 
-// routes
+// Routes
 app.use("/api/auth", authRoutes)
 app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/appointments", appointmentRoutes)
 app.use("/api/contact", contactRoutes)
+app.use("/api", utilityRoutes)
 
-
-// error handling middleware
+// Error handling middleware
 app.use(errorHandler)
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ error: "Endpoint not found" })
+  res.status(404).json({ error: "Endpoint not found" })
 })
 
-// server
+// Start server
 app.listen(PORT, () => {
-    console.log(`Layole backend server running on port ${PORT}`)
+  console.log(`Hospital backend server running on port ${PORT}`)
+  console.log(`Health check: http://localhost:${PORT}/api/health`)
 })
 
 module.exports = app
