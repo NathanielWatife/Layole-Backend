@@ -1,44 +1,42 @@
-const { sendContactConfirmation, sendContactNotification } = require("../utils/emailTemplates")
-const { sendEmail } = require("../utils/sendEmail")
+const { sendContactConfirmation, sendContactNotification } = require("../utils/emailTemplates");
+const { sendEmail } = require("../utils/sendEmail");
 const { validateContact } = require("../middleware/validation");
 
-//  POST /api/contact
-//  Public
 const createContact = [
-  validateContact, 
+  validateContact,
   async (req, res, next) => {
     try {
       const contactData = req.body;
 
       // Send confirmation email to sender
-      const confirmationEmailHtml = sendContactConfirmation(contactData);
       await sendEmail(
         contactData.email,
         "Message Received - Layole Hospital",
-        confirmationEmailHtml,
-        "Thank you for contacting Layole Hospital. We will respond soon.",
+        sendContactConfirmation(contactData),
+        "Thank you for contacting us. We'll respond soon."
       );
 
-      // Send notification email to hospital
-      const notificationEmailHtml = sendContactNotification(contactData);
+      // Send notification to hospital
       await sendEmail(
-        process.env.HOSPITAL_EMAIL,
-        "New Contact Form Submission",
-        notificationEmailHtml,
-        `New contact: ${contactData.firstName} ${contactData.lastName} - ${contactData.subject}`,
+        process.env.HOSPITAL_EMAIL || "layolehospital@yahoo.com",
+        `New Contact: ${contactData.subject}`,
+        sendContactNotification(contactData),
+        `New message from ${contactData.firstName} ${contactData.lastName}`
       );
 
-      res.status(201).json({
+      res.status(200).json({
         success: true,
-        message: "Message sent successfully",
+        message: "Message sent successfully"
       });
+
     } catch (error) {
-      next(error);
+      console.error("Email sending error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to send message. Please try again later."
+      });
     }
   }
 ];
 
-
-module.exports = {
-  createContact
-}
+module.exports = { createContact };
