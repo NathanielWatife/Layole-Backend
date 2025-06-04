@@ -1,5 +1,4 @@
 const Appointment = require("../models/Appointment")
-const Contact = require("../models/Contact")
 
 // @route   GET /api/dashboard/stats
 // @access  Private (Admin)
@@ -25,14 +24,10 @@ const getDashboardStats = async (req, res, next) => {
       todayAppointments,
       thisWeekAppointments,
       thisMonthAppointments,
-      totalContacts,
-      newContacts,
       appointmentsByDepartment,
       appointmentsByStatus,
       appointmentsTrend,
-      contactsBySubject,
       recentAppointments,
-      recentContacts,
     ] = await Promise.all([
       // Appointment counts
       Appointment.countDocuments(),
@@ -104,18 +99,14 @@ const getDashboardStats = async (req, res, next) => {
           todayAppointments,
           thisWeekAppointments,
           thisMonthAppointments,
-          totalContacts,
-          newContacts,
         },
         charts: {
           appointmentsByDepartment,
           appointmentsByStatus,
           appointmentsTrend,
-          contactsBySubject,
         },
         recent: {
           appointments: recentAppointments,
-          contacts: recentContacts,
         },
       },
     })

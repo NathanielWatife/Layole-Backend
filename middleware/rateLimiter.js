@@ -12,17 +12,7 @@ const appointmentLimiter = rateLimit({
   legacyHeaders: false,
 })
 
-// Contact form rate limiter
-const contactLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 contact requests per 15 minutes
-  message: {
-    success: false,
-    error: "Too many contact requests. Please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-})
+
 
 // General API rate limiter
 const generalLimiter = rateLimit({
@@ -38,6 +28,5 @@ const generalLimiter = rateLimit({
 
 module.exports = {
   appointmentLimiter,
-  contactLimiter,
   generalLimiter,
 }

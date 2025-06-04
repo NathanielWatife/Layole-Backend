@@ -1,6 +1,6 @@
 const { sendContactConfirmation, sendContactNotification } = require("../utils/emailTemplates")
 const { sendEmail } = require("../utils/sendEmail")
-const { validateContact } = require("./validation");
+const { validateContact } = require("../middleware/validation");
 
 //  POST /api/contact
 //  Public

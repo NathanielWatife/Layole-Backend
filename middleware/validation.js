@@ -111,9 +111,6 @@ const { body, validationResult } = require("express-validator")
 ]
 
 // Contact validation rules
-// validation.js (example)
-const { body, validationResult } = require('express-validator');
-
 const validateContact = [
   body('firstName').notEmpty().withMessage('First name is required'),
   body('lastName').notEmpty().withMessage('Last name is required'),
