@@ -3,50 +3,50 @@ const { sendAppointmentConfirmation, sendAppointmentNotification } = require("..
 const { sendEmail } = require("../utils/sendEmail")
 
 
-
 const createAppointment = async (req, res, next) => {
   try {
-    const appointmentData = req.body
+    const appointmentData = req.body;
 
-    // Check for existing appointment at the same time
+    // Convert date string to Date object
+    appointmentData.appointmentDate = new Date(appointmentData.appointmentDate);
+
+    // Check for existing appointment
     const existingAppointment = await Appointment.findOne({
       appointmentDate: appointmentData.appointmentDate,
       appointmentTime: appointmentData.appointmentTime,
-      status: { $in: ["pending", "confirmed"] },
-    })
+      status: { $in: ["pending", "confirmed"] }
+    });
 
     if (existingAppointment) {
       return res.status(400).json({
         success: false,
-        error: "This time slot is already booked. Please choose a different time.",
-      })
+        error: "This time slot is already booked. Please choose a different time."
+      });
     }
 
     // Create new appointment
-    const appointment = new Appointment(appointmentData)
-    await appointment.save()
+    const appointment = new Appointment(appointmentData);
+    await appointment.save();
 
-    // Send confirmation email to patient
+    // Send emails (don't block response if email fails)
     try {
-      const patientEmailHtml = sendAppointmentConfirmation(appointment)
+      // Patient confirmation
       await sendEmail(
         appointment.email,
-        "Appointment Confirmation - MediCare Hospital",
-        patientEmailHtml,
-        `Appointment confirmed for ${new Date(appointment.appointmentDate).toLocaleDateString()} at ${appointment.appointmentTime}`,
-      )
+        "Appointment Confirmation - Layole Hospital",
+        sendAppointmentConfirmation(appointment),
+        `Your appointment is confirmed for ${appointment.appointmentDate.toLocaleDateString()} at ${appointment.appointmentTime}`
+      );
 
-      // Send notification email to hospital
-      const hospitalEmailHtml = sendAppointmentNotification(appointment)
+      // Hospital notification
       await sendEmail(
-        process.env.HOSPITAL_EMAIL || "appointments@medicarehospital.com",
+        process.env.HOSPITAL_EMAIL || "layolehospital@yahoo.com",
         "New Appointment Booking",
-        hospitalEmailHtml,
-        `New appointment: ${appointment.fullName} - ${new Date(appointment.appointmentDate).toLocaleDateString()}`,
-      )
+        sendAppointmentNotification(appointment),
+        `New appointment: ${appointment.firstName} ${appointment.lastName}`
+      );
     } catch (emailError) {
-      console.error("Email sending failed:", emailError)
-      // Continue without failing the appointment creation
+      console.error("Email sending error:", emailError);
     }
 
     res.status(201).json({
@@ -54,15 +54,17 @@ const createAppointment = async (req, res, next) => {
       message: "Appointment booked successfully",
       data: {
         appointmentId: appointment._id,
-        appointmentDate: appointment.appointmentDate,
-        appointmentTime: appointment.appointmentTime,
-        department: appointment.department,
-      },
-    })
+        date: appointment.appointmentDate.toISOString().split('T')[0],
+        time: appointment.appointmentTime,
+        department: appointment.department
+      }
+    });
+
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
 
 
 const getAppointments = async (req, res, next) => {
