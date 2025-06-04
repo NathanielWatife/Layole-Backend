@@ -11,8 +11,8 @@ const authRoutes = require("./routes/authRoutes")
 const dashboardRoutes = require("./routes/dashboardRoutes")
 const utilityRoutes = require("./routes/utilityRoutes")
 const errorHandler = require("./middleware/errorHandler")
-
 const app = express()
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000
 
 // Connect to database
@@ -39,6 +39,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: "Too many requests from this IP, please try again later.",
+  trustProxy: true
 })
 app.use("/api/", limiter)
 

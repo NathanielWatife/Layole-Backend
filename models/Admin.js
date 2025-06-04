@@ -57,10 +57,6 @@ const adminSchema = new mongoose.Schema({
 },)
 
 
-// index for efficient queries
-adminSchema.index({ username: 1 })
-adminSchema.index({ email: 1 })
-
 // virtual for full name
 adminSchema.virtual("fullName").get(function () {
     return `${this.firstName} ${this.lastName}`

@@ -1,5 +1,7 @@
+// emailTemplates.js
+
 // Appointment confirmation email template
-const sendAppointmentConfirmation = (appointment) => {
+const sendAppointmentConfirmation = (appointmentData) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -25,22 +27,22 @@ const sendAppointmentConfirmation = (appointment) => {
             </div>
             
             <div class="content">
-                <p>Dear ${appointment.firstName} ${appointment.lastName},</p>
+                <p>Dear ${appointmentData.firstName} ${appointmentData.lastName},</p>
                 
                 <p>Thank you for booking an appointment with Layole Hospital. Your appointment has been successfully scheduled.</p>
                 
                 <div class="appointment-details">
                     <h3>📅 Appointment Details</h3>
-                    <p><strong>Date:</strong> ${new Date(appointment.appointmentDate).toLocaleDateString("en-US", {
+                    <p><strong>Date:</strong> ${new Date(appointmentData.appointmentDate).toLocaleDateString("en-US", {
                       weekday: "long",
                       year: "numeric",
                       month: "long",
                       day: "numeric",
                     })}</p>
-                    <p><strong>Time:</strong> ${appointment.appointmentTime}</p>
-                    <p><strong>Department:</strong> ${appointment.department.charAt(0).toUpperCase() + appointment.department.slice(1).replace("-", " ")}</p>
-                    ${appointment.doctor ? `<p><strong>Doctor:</strong> ${appointment.doctor}</p>` : ""}
-                    <p><strong>Reason for Visit:</strong> ${appointment.reason}</p>
+                    <p><strong>Time:</strong> ${appointmentData.appointmentTime}</p>
+                    <p><strong>Department:</strong> ${appointmentData.department.charAt(0).toUpperCase() + appointmentData.department.slice(1).replace("-", " ")}</p>
+                    ${appointmentData.doctor ? `<p><strong>Doctor:</strong> ${appointmentData.doctor}</p>` : ""}
+                    <p><strong>Reason for Visit:</strong> ${appointmentData.reason}</p>
                     <p><strong>Status:</strong> <span style="color: #28a745; font-weight: bold;">Confirmed</span></p>
                 </div>
                 
@@ -53,12 +55,12 @@ const sendAppointmentConfirmation = (appointment) => {
                 </ul>
                 
                 <h3>📞 Contact Information</h3>
-                <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-                <p><strong>Email:</strong> appointments@Layolehospital.com</p>
-                <p><strong>Address:</strong> 123 Healthcare Avenue, Medical City, MC 12345</p>
+                <p><strong>Phone:</strong> +234-7081209617, +234-9067020311</p>
+                <p><strong>Email:</strong> layolehospital@yahoo.com</p>
+                <p><strong>Address:</strong> Oyemekun Street, no 89 Off College Road, Ifako-Ijaiye, Lagos, Nigeria. P.O. Box 2818 Agege, Lagos.</p>
                 
                 <p style="margin-top: 30px;">
-                    <a href="https://maps.google.com/?q=123+Healthcare+Avenue,+Medical+City,+MC+12345" class="btn">Get Directions</a>
+                    <a href="https://maps.google.com/?q=Oyemekun+Street,+no+89+Off+College+Road,+Ifako-Ijaiye,+Lagos,+Nigeria" class="btn">Get Directions</a>
                 </p>
             </div>
             
@@ -69,11 +71,11 @@ const sendAppointmentConfirmation = (appointment) => {
         </div>
     </body>
     </html>
-  `
-}
+  `;
+};
 
 // Appointment notification email for hospital staff
-const sendAppointmentNotification = (appointment) => {
+const sendAppointmentNotification = (appointmentData) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -102,28 +104,28 @@ const sendAppointmentNotification = (appointment) => {
                 
                 <div class="patient-info">
                     <h3>👤 Patient Information</h3>
-                    <p><strong>Name:</strong> ${appointment.firstName} ${appointment.lastName}</p>
-                    <p><strong>Email:</strong> ${appointment.email}</p>
-                    <p><strong>Phone:</strong> ${appointment.phone}</p>
-                    <p><strong>Date of Birth:</strong> ${new Date(appointment.dateOfBirth).toLocaleDateString()}</p>
-                    <p><strong>Gender:</strong> ${appointment.gender}</p>
-                    ${appointment.address ? `<p><strong>Address:</strong> ${appointment.address}</p>` : ""}
-                    ${appointment.insurance ? `<p><strong>Insurance:</strong> ${appointment.insurance}</p>` : ""}
+                    <p><strong>Name:</strong> ${appointmentData.firstName} ${appointmentData.lastName}</p>
+                    <p><strong>Email:</strong> ${appointmentData.email}</p>
+                    <p><strong>Phone:</strong> ${appointmentData.phone}</p>
+                    ${appointmentData.dateOfBirth ? `<p><strong>Date of Birth:</strong> ${new Date(appointmentData.dateOfBirth).toLocaleDateString()}</p>` : ""}
+                    ${appointmentData.gender ? `<p><strong>Gender:</strong> ${appointmentData.gender}</p>` : ""}
+                    ${appointmentData.address ? `<p><strong>Address:</strong> ${appointmentData.address}</p>` : ""}
+                    ${appointmentData.insurance ? `<p><strong>Insurance:</strong> ${appointmentData.insurance}</p>` : ""}
                 </div>
                 
                 <div class="appointment-info">
                     <h3>📅 Appointment Information</h3>
-                    <p><strong>Date:</strong> ${new Date(appointment.appointmentDate).toLocaleDateString("en-US", {
+                    <p><strong>Date:</strong> ${new Date(appointmentData.appointmentDate).toLocaleDateString("en-US", {
                       weekday: "long",
                       year: "numeric",
                       month: "long",
                       day: "numeric",
                     })}</p>
-                    <p><strong>Time:</strong> ${appointment.appointmentTime}</p>
-                    <p><strong>Department:</strong> ${appointment.department.charAt(0).toUpperCase() + appointment.department.slice(1).replace("-", " ")}</p>
-                    ${appointment.doctor ? `<p><strong>Preferred Doctor:</strong> ${appointment.doctor}</p>` : ""}
-                    <p><strong>Reason for Visit:</strong> ${appointment.reason}</p>
-                    <p><strong>Booking Time:</strong> ${new Date(appointment.createdAt).toLocaleString()}</p>
+                    <p><strong>Time:</strong> ${appointmentData.appointmentTime}</p>
+                    <p><strong>Department:</strong> ${appointmentData.department.charAt(0).toUpperCase() + appointmentData.department.slice(1).replace("-", " ")}</p>
+                    ${appointmentData.doctor ? `<p><strong>Preferred Doctor:</strong> ${appointmentData.doctor}</p>` : ""}
+                    <p><strong>Reason for Visit:</strong> ${appointmentData.reason}</p>
+                    <p><strong>Booking Time:</strong> ${new Date().toLocaleString()}</p>
                 </div>
                 
                 <p><strong>Action Required:</strong> Please review and confirm this appointment in the hospital management system.</p>
@@ -131,11 +133,15 @@ const sendAppointmentNotification = (appointment) => {
         </div>
     </body>
     </html>
-  `
-}
+  `;
+};
 
 // Contact form confirmation email
 const sendContactConfirmation = (contactData) => {
+  const formattedSubject = contactData.subject 
+    ? contactData.subject.charAt(0).toUpperCase() + contactData.subject.slice(1).replace("-", " ")
+    : 'General Inquiry';
+
   return `
     <!DOCTYPE html>
     <html>
@@ -160,21 +166,21 @@ const sendContactConfirmation = (contactData) => {
             </div>
             
             <div class="content">
-                <p>Dear ${contact.firstName} ${contact.lastName},</p>
+                <p>Dear ${contactData.firstName} ${contactData.lastName},</p>
                 
                 <p>Thank you for contacting Layole Hospital. We have received your message and will respond within 24-48 hours during business days.</p>
                 
                 <div class="message-details">
                     <h3>📝 Your Message</h3>
-                    <p><strong>Subject:</strong> ${contact.subject.charAt(0).toUpperCase() + contact.subject.slice(1).replace("-", " ")}</p>
+                    <p><strong>Subject:</strong> ${formattedSubject}</p>
                     <p><strong>Message:</strong></p>
-                    <p style="background: #f8f9fa; padding: 15px; border-left: 4px solid #2c5aa0;">${contact.message}</p>
-                    <p><strong>Submitted:</strong> ${new Date(contact.createdAt).toLocaleString()}</p>
+                    <p style="background: #f8f9fa; padding: 15px; border-left: 4px solid #2c5aa0;">${contactData.message}</p>
+                    <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                 </div>
                 
                 <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0;">
                     <p><strong>⚠️ Medical Emergency?</strong></p>
-                    <p>If this is a medical emergency, please call <strong>911</strong> immediately or visit our Emergency Department. Do not wait for an email response.</p>
+                    <p>If this is a medical emergency, please call <strong>+234-7081209617</strong> immediately or visit our Emergency Department. Do not wait for an email response.</p>
                 </div>
                 
                 <h3>📞 Contact Information</h3>
@@ -191,11 +197,15 @@ const sendContactConfirmation = (contactData) => {
         </div>
     </body>
     </html>
-  `
-}
+  `;
+};
 
 // Contact form notification for hospital staff
-const sendContactNotification = (contact) => {
+const sendContactNotification = (contactData) => {
+  const formattedSubject = contactData.subject 
+    ? contactData.subject.charAt(0).toUpperCase() + contactData.subject.slice(1).replace("-", " ")
+    : 'General Inquiry';
+
   return `
     <!DOCTYPE html>
     <html>
@@ -227,15 +237,15 @@ const sendContactNotification = (contact) => {
                 
                 <div class="contact-details">
                     <h3>👤 Contact Information</h3>
-                    <p><strong>Name:</strong> ${contact.firstName} ${contact.lastName}</p>
-                    <p><strong>Email:</strong> ${contact.email}</p>
-                    ${contact.phone ? `<p><strong>Phone:</strong> ${contact.phone}</p>` : ""}
-                    <p><strong>Submitted:</strong> ${new Date(contact.createdAt).toLocaleString()}</p>
+                    <p><strong>Name:</strong> ${contactData.firstName} ${contactData.lastName}</p>
+                    <p><strong>Email:</strong> ${contactData.email}</p>
+                    ${contactData.phone ? `<p><strong>Phone:</strong> ${contactData.phone}</p>` : ""}
+                    <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
                 </div>
                 
                 <div class="contact-details">
                     <h3>📝 Message Details</h3>
-                    <p><strong>Subject:</strong> ${contact.subject.charAt(0).toUpperCase() + contact.subject.slice(1).replace("-", " ")}</p>
+                    <p><strong>Subject:</strong> ${formattedSubject}</p>
                     
                     <div class="priority medium">
                         <p><strong>Priority:</strong> Medium (Auto-assigned)</p>
@@ -243,7 +253,7 @@ const sendContactNotification = (contact) => {
                     
                     <p><strong>Message:</strong></p>
                     <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #17a2b8; margin: 10px 0;">
-                        ${contact.message}
+                        ${contactData.message}
                     </div>
                 </div>
                 
@@ -261,12 +271,12 @@ const sendContactNotification = (contact) => {
         </div>
     </body>
     </html>
-  `
-}
+  `;
+};
 
 module.exports = {
   sendAppointmentConfirmation,
   sendAppointmentNotification,
   sendContactConfirmation,
-  sendContactNotification,
-}
+  sendContactNotification
+};

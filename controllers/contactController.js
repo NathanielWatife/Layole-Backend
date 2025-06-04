@@ -8,15 +8,14 @@ const createContact = [
     try {
       const contactData = req.body;
 
-      // Send confirmation email to sender
+      // Send emails
       await sendEmail(
         contactData.email,
         "Message Received - Layole Hospital",
         sendContactConfirmation(contactData),
-        "Thank you for contacting us. We'll respond soon."
+        "Thank you for contacting us"
       );
 
-      // Send notification to hospital
       await sendEmail(
         process.env.HOSPITAL_EMAIL || "layolehospital@yahoo.com",
         `New Contact: ${contactData.subject}`,
@@ -30,7 +29,7 @@ const createContact = [
       });
 
     } catch (error) {
-      console.error("Email sending error:", error);
+      console.error("Email error:", error);
       res.status(500).json({
         success: false,
         error: "Failed to send message. Please try again later."
