@@ -20,14 +20,14 @@ const sendAppointmentConfirmation = (appointment) => {
     <body>
         <div class="container">
             <div class="header">
-                <h1>🏥 MediCare Hospital</h1>
+                <h1>🏥 Layole Hospital</h1>
                 <h2>Appointment Confirmation</h2>
             </div>
             
             <div class="content">
                 <p>Dear ${appointment.firstName} ${appointment.lastName},</p>
                 
-                <p>Thank you for booking an appointment with MediCare Hospital. Your appointment has been successfully scheduled.</p>
+                <p>Thank you for booking an appointment with Layole Hospital. Your appointment has been successfully scheduled.</p>
                 
                 <div class="appointment-details">
                     <h3>📅 Appointment Details</h3>
@@ -54,7 +54,7 @@ const sendAppointmentConfirmation = (appointment) => {
                 
                 <h3>📞 Contact Information</h3>
                 <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-                <p><strong>Email:</strong> appointments@medicarehospital.com</p>
+                <p><strong>Email:</strong> appointments@Layolehospital.com</p>
                 <p><strong>Address:</strong> 123 Healthcare Avenue, Medical City, MC 12345</p>
                 
                 <p style="margin-top: 30px;">
@@ -63,7 +63,7 @@ const sendAppointmentConfirmation = (appointment) => {
             </div>
             
             <div class="footer">
-                <p>Thank you for choosing MediCare Hospital</p>
+                <p>Thank you for choosing Layole Hospital</p>
                 <p>Your health is our priority</p>
             </div>
         </div>
@@ -94,7 +94,7 @@ const sendAppointmentNotification = (appointment) => {
         <div class="container">
             <div class="header">
                 <h1>🚨 New Appointment Alert</h1>
-                <p>MediCare Hospital - Staff Notification</p>
+                <p>Layole Hospital - Staff Notification</p>
             </div>
             
             <div class="content">
@@ -135,7 +135,7 @@ const sendAppointmentNotification = (appointment) => {
 }
 
 // Contact form confirmation email
-const sendContactConfirmation = (contact) => {
+const sendContactConfirmation = (contactData) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -156,13 +156,13 @@ const sendContactConfirmation = (contact) => {
         <div class="container">
             <div class="header">
                 <h1>✅ Message Received</h1>
-                <p>MediCare Hospital</p>
+                <p>Layole Hospital</p>
             </div>
             
             <div class="content">
                 <p>Dear ${contact.firstName} ${contact.lastName},</p>
                 
-                <p>Thank you for contacting MediCare Hospital. We have received your message and will respond within 24-48 hours during business days.</p>
+                <p>Thank you for contacting Layole Hospital. We have received your message and will respond within 24-48 hours during business days.</p>
                 
                 <div class="message-details">
                     <h3>📝 Your Message</h3>
@@ -178,14 +178,14 @@ const sendContactConfirmation = (contact) => {
                 </div>
                 
                 <h3>📞 Contact Information</h3>
-                <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-                <p><strong>Email:</strong> info@medicarehospital.com</p>
-                <p><strong>Emergency:</strong> 911</p>
-                <p><strong>Address:</strong> 123 Healthcare Avenue, Medical City, MC 12345</p>
+                <p><strong>Phone:</strong> +234-7081209617, +234-9067020311</p>
+                <p><strong>Email:</strong> layolehospital@yahoo.com</p>
+                <p><strong>Emergency:</strong> +234-7081209617</p>
+                <p><strong>Address:</strong> Oyemekun Street, no 89 Off College Road, Ifako-Ijaiye, Lagos, Nigeria. P.O. Box 2818 Agege, Lagos.</p>
             </div>
             
             <div class="footer">
-                <p>Thank you for choosing MediCare Hospital</p>
+                <p>Thank you for choosing Layole Hospital</p>
                 <p>We appreciate your trust in our healthcare services</p>
             </div>
         </div>
@@ -219,7 +219,7 @@ const sendContactNotification = (contact) => {
         <div class="container">
             <div class="header">
                 <h1>📧 New Contact Message</h1>
-                <p>MediCare Hospital - Staff Notification</p>
+                <p>Layole Hospital - Staff Notification</p>
             </div>
             
             <div class="content">

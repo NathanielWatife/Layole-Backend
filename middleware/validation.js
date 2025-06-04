@@ -111,46 +111,18 @@ const { body, validationResult } = require("express-validator")
 ]
 
 // Contact validation rules
+// validation.js (example)
+const { body, validationResult } = require('express-validator');
+
 const validateContact = [
-  // First Name validation
-  body('firstName')
-    .trim()
-    .notEmpty().withMessage('First name is required')
-    .isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
-
-  // Last Name validation
-  body('lastName')
-    .trim()
-    .notEmpty().withMessage('Last name is required')
-    .isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
-
-  // Email validation
-  body('email')
-    .trim()
-    .notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Invalid email address'),
-
-  // Subject validation
-  body('subject')
-    .trim()
-    .notEmpty().withMessage('Subject is required')
-    .isIn(['general-inquiry', 'appointment', 'billing', 'medical-records', 'feedback', 'other'])
-    .withMessage('Invalid subject'),
-
-  // Message validation
-  body('message')
-    .trim()
-    .notEmpty().withMessage('Message is required')
-    .isLength({ min: 10, max: 2000 }).withMessage('Message must be 10-2000 characters'),
-
-  // Phone validation (optional)
-  body('phone')
-    .optional({ checkFalsy: true })
-    .trim()
-    .isMobilePhone().withMessage('Invalid phone number'),
-
+  body('firstName').notEmpty().withMessage('First name is required'),
+  body('lastName').notEmpty().withMessage('Last name is required'),
+  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('subject').notEmpty().withMessage('Subject is required'),
+  body('message').notEmpty().withMessage('Message is required'),
   handleValidationErrors
 ];
+
 
 module.exports = {
   validateLogin,

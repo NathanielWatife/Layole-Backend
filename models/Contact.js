@@ -1,6 +1,4 @@
-const mongoose = require("mongoose")
-
-const contactSchema = new mongoose.Schema(
+const contactSchema = (
   {
     firstName: {
       type: String,
@@ -53,23 +51,4 @@ const contactSchema = new mongoose.Schema(
   },
 )
 
-// Index for efficient queries
-contactSchema.index({ status: 1 })
-contactSchema.index({ priority: 1 })
-contactSchema.index({ createdAt: -1 })
-
-// Virtual for full name
-contactSchema.virtual("fullName").get(function () {
-  return `${this.firstName} ${this.lastName}`
-})
-
-// Method to mark as resolved
-contactSchema.methods.markResolved = function (response, assignedTo) {
-  this.status = "resolved"
-  this.response = response
-  this.responseDate = new Date()
-  this.assignedTo = assignedTo
-  return this.save()
-}
-
-module.exports = mongoose.model("Contact", contactSchema)
+module.exports = model("Contact", contactSchema)
