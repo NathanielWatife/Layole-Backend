@@ -14,35 +14,81 @@ const { body, validationResult } = require("express-validator")
 }
 
 // Login validation rules
- const validateLogin = [
-  body("username").trim().isLength({ min: 1 }).withMessage("Username or email is required"),
-  body("password").isLength({ min: 1 }).withMessage("Password is required"),
-  handleValidationErrors,
-]
+const validateLogin = [
+    body('username')
+        .trim()
+        .notEmpty().withMessage('Username or email is required'),
+    
+    body('password')
+        .trim()
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+        next();
+    }
+];
 
-// Profile update validation rules
- const validateProfileUpdate = [
-  body("firstName")
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 50 })
-    .withMessage("First name must be between 1 and 50 characters"),
+const validateProfileUpdate = [
+    body('firstName')
+        .optional()
+        .trim()
+        .notEmpty().withMessage('First name is required')
+        .isLength({ max: 50 }).withMessage('First name too long'),
+    
+    body('lastName')
+        .optional()
+        .trim()
+        .notEmpty().withMessage('Last name is required')
+        .isLength({ max: 50 }).withMessage('Last name too long'),
+    
+    body('email')
+        .optional()
+        .trim()
+        .isEmail().withMessage('Invalid email address')
+        .normalizeEmail(),
+    
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+        next();
+    }
+];
 
-  body("lastName")
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 50 })
-    .withMessage("Last name must be between 1 and 50 characters"),
-  body("email").optional().isEmail().normalizeEmail().withMessage("Please provide a valid email address"),
-  handleValidationErrors,
-]
-
-// Password change validation rules
- const validatePasswordChange = [
-  body("currentPassword").isLength({ min: 1 }).withMessage("Current password is required"),
-  body("newPassword").isLength({ min: 6 }).withMessage("New password must be at least 6 characters long"),
-  handleValidationErrors,
-]
+const validatePasswordChange = [
+    body('currentPassword')
+        .trim()
+        .notEmpty().withMessage('Current password is required'),
+    
+    body('newPassword')
+        .trim()
+        .notEmpty().withMessage('New password is required')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+        .not().equals(body('currentPassword')).withMessage('New password must be different'),
+    
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+        next();
+    }
+];
 
 // Appointment validation rules
  const validateAppointment = [
