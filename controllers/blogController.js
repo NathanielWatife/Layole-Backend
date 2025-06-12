@@ -1,6 +1,6 @@
 const Admin = require("../models/Admin");
 const Blog = require("../models/Blog")
-const {  uploadImage } = require("../utils/cloudinary")
+const { uploadImage } = require("../utils/cloudinary")
 
 exports.createBlog = async (req, res, next) => {
     try {
