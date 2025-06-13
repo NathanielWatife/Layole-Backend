@@ -45,7 +45,7 @@ exports.fetchArticles = async () => {
 
 
     // save to database
-    await.Blog.insertMany(allArticles.map(article => ({
+    await Blog.insertMany(allArticles.map(article => ({
         ...article,
         isApproved: true
     })))
