@@ -1,6 +1,6 @@
 require('dotenv').config();
 const connectDB = require('../config/db');
-const Blog = require('../models/Blog');
+const Blog = require('../models/Article');
 const axios = require('axios');
 const { parseStringPromise } = require('xml2js');
 
