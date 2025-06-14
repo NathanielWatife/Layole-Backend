@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
-const blogSchema = new mongoose.Schema({
+const articleSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
   source: { type: String, required: true },
-  sourceUrl: { type: String },
+  sourceUrl: String,
   publishDate: { type: Date, default: Date.now },
-  tags: { type: [String], default: [] },
+  tags: [String],
   isApproved: { type: Boolean, default: true }
 });
 
-module.exports = mongoose.model('Blog', blogSchema);
+module.exports = mongoose.model('Article', articleSchema);
