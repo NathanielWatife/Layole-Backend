@@ -1,31 +1,30 @@
 const express = require('express');
-const Article = require('../models/Article');
+const {
+  getBlogs,
+  getBlog,
+  getRelatedBlogs,
+  getAdminBlogs,
+  createBlog,
+  updateBlog,
+  deleteBlog
+} = require('../controllers/blogController');
+const { protect, authorize } = require('../middleware/auth');
+const upload = require('../utils/multer');
+
 const router = express.Router();
 
-// Get all approved articles
-router.get('/', async (req, res) => {
-  try {
-    const articles = await Article.find({ isApproved: true })
-      .sort({ publishDate: -1 })
-      .limit(10);
-    res.json(articles);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// Public routes
+router.get('/', getBlogs);
+router.get('/:slug', getBlog);
+router.get('/:slug/related', getRelatedBlogs);
 
-// Get single article
-router.get('/:slug', async (req, res) => {
-  try {
-    const article = await Article.findOne({ 
-      slug: req.params.slug,
-      isApproved: true 
-    });
-    if (!article) return res.status(404).json({ message: 'Article not found' });
-    res.json(article);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// Protected admin routes
+router.use(protect);
+router.use(authorize('admin', 'editor'));
+
+router.get('/admin', getAdminBlogs);
+router.post('/', upload.single('featuredImage'), createBlog);
+router.put('/:id', upload.single('featuredImage'), updateBlog);
+router.delete('/:id', deleteBlog);
 
 module.exports = router;

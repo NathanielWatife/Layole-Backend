@@ -121,6 +121,12 @@ const getAppointments = async (req, res, next) => {
 
 const getAppointment = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            success: false,
+            error: "Invalid"
+        });
+    }
     const appointment = await Appointment.findById(req.params.id)
 
     if (!appointment) {
@@ -171,6 +177,12 @@ const updateAppointment = async (req, res, next) => {
 
 const deleteAppointment = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            success: false,
+            error: "Invalid"
+        });
+    }
     const appointment = await Appointment.findById(req.params.id)
 
     if (!appointment) {
