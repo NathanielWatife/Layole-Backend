@@ -9,7 +9,6 @@ const appointmentRoutes = require("./routes/appointmentRoutes")
 const contactRoutes = require("./routes/contactRoutes")
 const authRoutes = require("./routes/authRoutes")
 const dashboardRoutes = require("./routes/dashboardRoutes")
-const blogRoutes = require('./routes/blogRoutes');
 const utilityRoutes = require("./routes/utilityRoutes")
 const errorHandler = require("./middleware/errorHandler")
 const app = express()
@@ -63,7 +62,6 @@ app.use("/api/auth", authRoutes)
 app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/appointments", appointmentRoutes)
 app.use("/api/contact", contactRoutes)
-app.use('/api/blog', blogRoutes);
 app.use("/api", utilityRoutes)
 
 // Error handling middleware
