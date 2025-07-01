@@ -2,6 +2,8 @@ const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
 const rateLimit = require("express-rate-limit")
+const path = require("path")
+const morgan = require("morgan")
 require("dotenv").config()
 
 const connectDB = require("./config/db")
@@ -10,7 +12,9 @@ const contactRoutes = require("./routes/contactRoutes")
 const authRoutes = require("./routes/authRoutes")
 const dashboardRoutes = require("./routes/dashboardRoutes")
 const utilityRoutes = require("./routes/utilityRoutes")
+const blogRoutes = require("./routes/blogRoutes")
 const errorHandler = require("./middleware/errorHandler")
+
 const app = express()
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000
@@ -31,6 +35,13 @@ app.use(
     credentials: true
   })
 );
+
+// loggin in development
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// body parsers
 app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true }))
 
@@ -42,6 +53,19 @@ const limiter = rateLimit({
   trustProxy: true
 })
 app.use("/api/", limiter)
+
+
+app.use("/public", express.static(path.join(__dirname, "public")));
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "healthy",
+    timestamp: new Date(),
+    environment: process.env.NODE_ENV || "development",
+    database: "connected" // You could add DB ping check here
+  });
+});
+
 
 // Routes
 // Root route
@@ -63,19 +87,32 @@ app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/appointments", appointmentRoutes)
 app.use("/api/contact", contactRoutes)
 app.use("/api", utilityRoutes)
+app.use("/api/v1/blogs", blogRoutes)
 
 // Error handling middleware
 app.use(errorHandler)
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: "Endpoint not found" })
+  res.status(404).json({
+    status: "fail",
+    message: "Resource not found",
+    endpoint: req.originalUrl
+  })
 })
 
 // Start server
 app.listen(PORT, () => {
   console.log(`Hospital backend server running on port ${PORT}`)
   console.log(`Health check: http://localhost:${PORT}/api/health`)
-})
+});
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});
 
 module.exports = app
