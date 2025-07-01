@@ -76,7 +76,7 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
     const total = await Blog.countDocuments(query);
     res.status(200).json({
         status: 'success',
-        result: blogs.length
+        result: blogs.length,
         data: {
             blogs
         }
