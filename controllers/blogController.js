@@ -70,4 +70,104 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
 
     const blogs = await Blog.find(query)
         .sort('-publishedAt')
+        .skip(skip)
+        .limit(limit);
+
+    const total = await Blog.countDocuments(query);
+    res.status(200).json({
+        status: 'success',
+        result: blogs.length
+        data: {
+            blogs
+        }
+    });
+});
+
+
+
+// get a single blog post by slug
+exports.getBlog = catchAsync(async (req, res, next) => {
+    const blog = await Blog.findOne({ slug: req.params.slug });
+    if (!blog) {
+        return next (new AppError('No blog found with that slug', 404));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            blog
+        }
+    });
+});
+
+
+// update a blog post
+exports.updateBlog = catchAsync(async (req, res, next) => {
+    const { title, content, excerpt, categories, status } = req.body;
+    // find the blog 
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+        return next(new AppError('No blog found with that ID', 404));
+    }
+
+    // check if user is author or admin
+    if(blog.author.toString() !== req.user.id && req.user.role !== 'admin'){
+        return next(new AppError('You are not authorized to update this blog', 403));
+    }
+    // image update
+    if (req.file){
+        // delete the old image from cloudinary
+        if(blog.featuredImage.public_id){
+            await cloudinary.uploader.destroy(blog.featuredImage.public_id);
+        }
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'layole-hospital/blogs',
+            width: 1200,
+            crop: 'scale'
+        });
+
+        blog.featuredImage = {
+            public_id: result.public_id,
+            url: result.secure_url
+        };
+    }
+
+    blog.title = title || blog.title;
+    blog.content = content || blog.content;
+    blog.excerpt = excerpt || blog.excerpt;
+    blog.categories = categories ? categories.split(',') : blog.categories;
+    blog.status = status || blog.status;
+    blog.publishedAt = status === 'published' ? Date.now() : blog.publishedAt;
+    await blog.save();
+    res.status(200).json({
+        status: 'success',
+        data: {
+            blog
+        }
+    });
+});
+
+
+// delete blog
+exports.deleteBlog = catchAsync(async (req, res, next) => {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+        return next(new AppError('No blog found with that ID', 404));
+    }
+
+    // check if user is author or admin
+    if (blog.author.toString() !== req.user.id && req.user.role !== 'admin') {
+        return next(new AppError('You are not authorized to delete this blog', 403));
+    }
+    // delete the image from cloudinary
+    if (blog.featuredImage.public_id) {
+        await cloudinary.uploader.destroy(blog.featuredImage.public_id);
+    }
+    await blog.remove();
+    res.status(204).json({
+        status: 'success',
+        data: null
+    });
 });
