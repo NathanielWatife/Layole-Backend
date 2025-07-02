@@ -1,37 +1,31 @@
-const Appointment = require("../models/Appointment");
+const Blog = require("../models/Blog");
+
 
 const getDashboardStats = async (req, res, next) => {
-    try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
+    try {        
         const [
-            totalAppointments,
-            pendingAppointments,
-            todayAppointments,
-            recentAppointments
+            totalBlogs,
+            publishBlogs,
+            draftBlogs,
+            recentBlogs
         ] = await Promise.all([
-            Appointment.countDocuments(),
-            Appointment.countDocuments({ status: "pending" }),
-            Appointment.countDocuments({
-                appointmentDate: { 
-                    $gte: today,
-                    $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
-                }
-            }),
-            Appointment.find()
+            Blog.countDocuments(),
+            Blog.countDocuments({ status: "published" }),
+            Blog.countDocuments({ status: "draft" }),
+            Blog.find()
                 .sort({ createdAt: -1 })
                 .limit(5)
-                .select("firstName lastName department appointmentDate status")
+                .select("title status publishedAt author")
+                .populate('author', 'username')
         ]);
 
         res.json({
             success: true,
             data: {
-                totalAppointments,
-                pendingAppointments,
-                todayAppointments,
-                recentAppointments
+                totalBlogs,
+                publishBlogs,
+                draftBlogs,
+                recentBlogs
             }
         });
     } catch (error) {
@@ -39,7 +33,7 @@ const getDashboardStats = async (req, res, next) => {
     }
 };
 
-const getAppointmentAnalytics = async (req, res, next) => {
+const getBlogAnalytics = async (req, res, next) => {
     try {
         const { period = "month" } = req.query;
         let dateRange = new Date();
@@ -58,8 +52,8 @@ const getAppointmentAnalytics = async (req, res, next) => {
                 dateRange.setMonth(dateRange.getMonth() - 1);
         }
 
-        const [appointmentsByDate, peakHours] = await Promise.all([
-            Appointment.aggregate([
+        const [blogsByDate, popularCategories] = await Promise.all([
+            Blog.aggregate([
                 {
                     $match: {
                         createdAt: { $gte: dateRange }
@@ -73,10 +67,11 @@ const getAppointmentAnalytics = async (req, res, next) => {
                 },
                 { $sort: { _id: 1 } }
             ]),
-            Appointment.aggregate([
+            Blog.aggregate([
+                { $unwind: "$categories" },
                 {
                     $group: {
-                        _id: "$appointmentTime",
+                        _id: "$categories",
                         count: { $sum: 1 }
                     }
                 },
@@ -89,8 +84,8 @@ const getAppointmentAnalytics = async (req, res, next) => {
             success: true,
             data: {
                 period,
-                appointmentsByDate,
-                peakHours
+                blogsByDate,
+                popularCategories
             }
         });
     } catch (error) {
@@ -100,5 +95,5 @@ const getAppointmentAnalytics = async (req, res, next) => {
 
 module.exports = {
     getDashboardStats,
-    getAppointmentAnalytics
+    getBlogAnalytics
 };

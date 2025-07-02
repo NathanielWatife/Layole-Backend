@@ -1,34 +1,40 @@
 #!/usr/bin/env node
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 const Admin = require('../models/Admin');
 const connectDB = require('../config/db');
 const readline = require('readline');
 const mongoose = require('mongoose');
 
-// Create a more reliable readline interface
+// Enhanced readline interface
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-// Standard question function
-function question(prompt) {
-  return new Promise((resolve) => {
-    rl.question(prompt, (answer) => {
-      resolve(answer.trim());
-    });
-  });
+// Improved question function with validation
+async function question(prompt, validate = null) {
+  while (true) {
+    const answer = (await new Promise(resolve => {
+      rl.question(prompt, resolve);
+    })).trim();
+
+    if (!validate || validate(answer)) {
+      return answer;
+    }
+    console.log('Invalid input. Please try again.');
+  }
 }
 
-// Password input with asterisks
-function questionHidden(prompt) {
-  return new Promise((resolve) => {
-    const stdin = process.openStdin();
-    let input = '';
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
+// Secure password input
+async function questionHidden(prompt) {
+  const stdin = process.openStdin();
+  let input = '';
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
 
+  return new Promise((resolve) => {
     const onData = (char) => {
       char = char.toString();
       switch (char) {
@@ -37,18 +43,23 @@ function questionHidden(prompt) {
         case '\u0004':  // Ctrl-D
           process.stdin.setRawMode(false);
           process.stdin.removeListener('data', onData);
-          process.stdout.write('\n');
+          console.log();
           resolve(input);
           break;
         case '\u0003':  // Ctrl-C
           process.stdin.setRawMode(false);
           process.stdin.removeListener('data', onData);
-          process.stdout.write('\n');
+          console.log();
           process.exit();
           break;
+        case '\b':  // Backspace
+        case '\x7f':
+          input = input.slice(0, -1);
+          process.stdout.write('\x1B[2K\x1B[200D' + prompt + '*'.repeat(input.length));
+          break;
         default:
-          process.stdout.write('\x1B[2K\x1B[200D' + prompt + '*'.repeat(input.length + 1));
           input += char;
+          process.stdout.write('\x1B[2K\x1B[200D' + prompt + '*'.repeat(input.length));
           break;
       }
     };
@@ -63,24 +74,42 @@ async function createAdmin() {
     await connectDB();
     console.log('\n=== Admin Account Creation ===\n');
 
-    // Get all inputs
-    const username = await question('Username (3-30 chars): ');
-    const email = await question('Email: ');
-    const firstName = await question('First Name: ');
-    const lastName = await question('Last Name: ');
+    // Get admin details
+    const username = await question('Username (3-30 chars): ', 
+      input => input.length >= 3 && input.length <= 30);
+    
+    const email = await question('Email: ', 
+      validator.isEmail);
+    
+    const firstName = await question('First Name: ', 
+      input => input.length > 0);
+    
+    const lastName = await question('Last Name: ', 
+      input => input.length > 0);
+    
     const password = await questionHidden('Password (min 8 chars): ');
     const confirmPassword = await questionHidden('Confirm Password: ');
-    const role = await question('Role (admin/super-admin/staff): ');
+    
+    const role = await question('Role (admin/super-admin/staff) [admin]: ', 
+      input => !input || ['admin', 'super-admin', 'staff'].includes(input.toLowerCase())) || 'admin';
 
     // Validations
+    if (password.length < 8) {
+      throw new Error('Password must be at least 8 characters');
+    }
     if (password !== confirmPassword) {
       throw new Error('Passwords do not match');
     }
-    if (!['admin', 'super-admin', 'staff'].includes(role.toLowerCase())) {
-      throw new Error('Invalid role. Use admin/super-admin/staff');
+
+    // Check if admin exists
+    const existingAdmin = await Admin.findOne({ 
+      $or: [{ username }, { email }] 
+    });
+    if (existingAdmin) {
+      throw new Error('Admin with this username or email already exists');
     }
 
-    // Create and save admin
+    // Create admin
     const admin = new Admin({
       username,
       email: email.toLowerCase(),
@@ -88,7 +117,8 @@ async function createAdmin() {
       lastName,
       password: await bcrypt.hash(password, 12),
       role: role.toLowerCase(),
-      isActive: true
+      isActive: true,
+      createdAt: new Date()
     });
 
     await admin.save();
@@ -97,12 +127,13 @@ async function createAdmin() {
     console.log(`Username: ${username}`);
     console.log(`Email: ${email}`);
     console.log(`Role: ${role}`);
+    console.log(`ID: ${admin._id}`);
   } catch (error) {
     console.error('\n❌ Error:', error.message);
+    process.exitCode = 1;
   } finally {
     await mongoose.disconnect();
     rl.close();
-    process.exit(0);
   }
 }
 

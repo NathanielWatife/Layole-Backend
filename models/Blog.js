@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const blogSchema = new mongoose.Schema({
     title: {
@@ -27,45 +28,70 @@ const blogSchema = new mongoose.Schema({
         public_id: String,
         url: String
     },
-    categories: [{
+    categories: {
+        type: [String],
+        validate: function(val) {
+            return val.length <= 5;
+        },
+        message: 'A blog can have a maximum of 5 categories'
+    },
+    status: {
         type: String,
-        enum: ['Medical Tips', 'Health News', 'Patient Stories', 'Disease Preventions']
-    }],
+        enum: ['draft', 'published', 'archived'],
+        default: 'draft',
+    },
     author: {
         type: mongoose.Schema.ObjectId,
         ref: "Admin",
         required: true
     },
-    status: {
-        type: String,
-        enum: ['draft', 'published'],
-        default: 'draft'
-    },
     publishedAt: {
         type: Date,
         default: Date.now
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    },
+    seoTitle: String,
+    seoDescription: String,
+    seoKeywords: [String],
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
-
-
-// query middleware to populate author
-
+// Create slug before saving
 blogSchema.pre('save', function(next) {
-    this.slug = this.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-    next();
-});
-
-// query middleware to populate author
-blogSchema.pre('/^find/', function(next){
-    this.populate({
-        path: 'author',
-        select: 'name email'
+    if (!this.isModified('title')) return next();
+    
+    this.slug = slugify(this.title, { 
+        lower: true,
+        strict: true,
+        remove: /[*+~.()'"!:@]/g
     });
     next();
 });
 
-module.exports = mongoose.model('Blog', blogSchema)
+// Update timestamp when status changes to published
+blogSchema.pre('save', function(next) {
+    if (this.isModified('status') && this.status === 'published' && !this.publishedAt) {
+        this.publishedAt = Date.now();
+    }
+    next();
+});
+
+// Indexes for better performance
+blogSchema.index({ slug: 1 });
+blogSchema.index({ author: 1 });
+blogSchema.index({ status: 1 });
+blogSchema.index({ publishedAt: -1 });
+blogSchema.index({ categories: 1 });
+
+const Blog = mongoose.model('Blog', blogSchema);
+
+module.exports = Blog;

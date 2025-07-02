@@ -7,12 +7,12 @@ const router = express.Router();
 
 // public routes 
 router.get('/', blogController.getAllBlogs);
-router.get('/:slug', blogController.getBlogBySlug);
+router.get('/:slug', blogController.getBlog);
 
 // protected routes
 router.use(authController.protect);
 // admin routes
-router.use(authController.restrictTo('admin', 'editor'));
+router.use(authController.authorize('admin', 'editor'));
 
 router.post(
     '/',

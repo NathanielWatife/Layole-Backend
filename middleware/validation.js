@@ -167,10 +167,26 @@ const validateContact = [
 ];
 
 
+const validateBlog = [
+  body('title')
+    .trim()
+    .notEmpty().withMessage('Title is required')
+    .isLength({ max: 120 }).withMessage('Title must be less than 120 characters'),
+  
+  body('content')
+    .trim()
+    .notEmpty().withMessage('Content is required')
+    .isLength({ min: 500 }).withMessage('Content must be at least 500 characters'),
+  
+  // ... (other validation rules from previous response)
+  handleValidationErrors
+];
+
 module.exports = {
   validateLogin,
   validateProfileUpdate,
   validatePasswordChange,
   validateAppointment,
-  validateContact
+  validateContact,
+  validateBlog
 }

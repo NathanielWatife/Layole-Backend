@@ -1,82 +1,85 @@
-const jwt = require("jsonwebtoken")
-const Admin = require("../models/Admin")
+const jwt = require('jsonwebtoken');
+const Admin = require('../models/Admin');
+const AppError = require('../utils/appError');
 
-// Protect routes - require authentication
-const protect = async (req, res, next) => {
+exports.protect = async (req, res, next) => {
   try {
-    let token
-
-    // Check for token in headers
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      token = req.headers.authorization.split(" ")[1]
+    // Getting token and check if it's there
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
     }
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        error: "Access denied. No token provided.",
-      })
+      return next(
+        new AppError('You are not logged in! Please log in to get access.', 401)
+      );
     }
 
-    try {
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    // Verification token
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get admin from token
-      const admin = await Admin.findById(decoded.id)
-
-      if (!admin) {
-        return res.status(401).json({
-          success: false,
-          error: "Token is not valid. Admin not found.",
-        })
-      }
-
-      if (!admin.isActive) {
-        return res.status(401).json({
-          success: false,
-          error: "Account is deactivated.",
-        })
-      }
-
-      // Add admin to request object
-      req.admin = {
-        id: admin._id,
-        username: admin.username,
-        role: admin.role,
-      }
-
-      next()
-    } catch (error) {
-      return res.status(401).json({
-        success: false,
-        error: "Token is not valid.",
-      })
+    // Check if admin still exists
+    const currentAdmin = await Admin.findById(decoded.id);
+    if (!currentAdmin) {
+      return next(
+        new AppError('The admin belonging to this token no longer exists.', 401)
+      );
     }
-  } catch (error) {
-    next(error)
+
+    // check  if token is invalidated
+    if (currentAdmin.invalidatTokens && currentAdmin.invalidatTokens.includes(token)){
+      return next(
+        new AppError('Invalid token! Please log in again.', 401)
+      );
+    }
+
+    // 4) Check if admin changed password after the token was issued
+    if (currentAdmin.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError('Admin recently changed password! Please log in again.', 401)
+      );
+    }
+
+    // GRANT ACCESS TO PROTECTED ROUTE
+    req.admin = currentAdmin;
+    next();
+  } catch (err) {
+    next(err);
   }
-}
+};
 
-// Authorize specific roles
-const authorize = (...roles) => {
+exports.authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.admin) {
-      return res.status(401).json({
-        success: false,
-        error: "Access denied. Authentication required.",
-      })
-    }
-
+    // roles ['admin', 'super-admin']. role='user'
     if (!roles.includes(req.admin.role)) {
-      return res.status(403).json({
-        success: false,
-        error: `Access denied. Role '${req.admin.role}' is not authorized.`,
-      })
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
     }
 
-    next()
-  }
-}
+    next();
+  };
+};
 
-module.exports = { protect, authorize }
+
+exports.checkBlogOwnership = async (req, res, next) => {
+  const blog = await Blog.findById(req.params.id);
+  
+  if (!blog) {
+    return next(new AppError('No blog found with that ID', 404));
+  }
+
+  // Admins can edit any blog, authors can only edit their own
+  if (blog.author.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new AppError('You do not have permission to perform this action', 403)
+    );
+  }
+
+  req.blog = blog;
+  next();
+};

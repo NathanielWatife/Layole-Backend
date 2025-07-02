@@ -26,7 +26,22 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 })
 
+const blogLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 50, // limit each IP to 50 blog operations per hour
+  message: {
+    success: false,
+    error: "Too many blog operations. Please try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 module.exports = {
   appointmentLimiter,
   generalLimiter,
+  blogLimiter,
 }
+
+
+
