@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const AppError = require('../utils/appError');
+const Blog = require("../models/Blog");
 
 exports.protect = async (req, res, next) => {
   try {
@@ -81,5 +82,24 @@ exports.checkBlogOwnership = async (req, res, next) => {
   }
 
   req.blog = blog;
+  next();
+};
+
+
+exports.checkBlogOwnership = async (req, res, next) => {
+  const blog = await Blog.findById(req.params.id);
+
+  if (!blog) {
+    return next(new AppError("No blog found with that ID", 404));
+  }
+
+  // admin functionality
+  if (blog.author.toString() !== re.admin._id.toString() && req.admin.role !== 'admin') {
+    return next(
+      new AppError("You do not have permission to perform this action", 403)
+    );
+  }
+
+  req.body = blog;
   next();
 };

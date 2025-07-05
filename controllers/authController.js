@@ -1,4 +1,5 @@
 const Admin = require("../models/Admin");
+const { protect, authorize } = require("../middleware/auth");
 const rateLimit = require("express-rate-limit");
 const AppError = require("../utils/appError");
 const crypto = require("crypto");
@@ -270,5 +271,7 @@ const changePassword = async (req, res, next) => {
     forgotPassword,
     resetPassword,
     logout,
-    getAuthors
+    getAuthors,
+    protect,
+    authorize
   };
