@@ -2,16 +2,12 @@ const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
 const rateLimit = require("express-rate-limit")
-const path = require("path")
 const morgan = require("morgan")
 require("dotenv").config()
 
 const connectDB = require("./config/db")
 const appointmentRoutes = require("./routes/appointmentRoutes")
 const contactRoutes = require("./routes/contactRoutes")
-const authRoutes = require("./routes/authRoutes")
-const dashboardRoutes = require("./routes/dashboardRoutes")
-const blogRoutes = require("./routes/blogRoutes")
 const utilityRoutes = require("./routes/utilityRoutes")
 const errorHandler = require("./middleware/errorHandler")
 
@@ -27,10 +23,6 @@ app.use(helmet())
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || [
-      "http://localhost:8080",
-      "http://127.0.0.1:5500",
-      "http://127.0.0.1:8080",
-      "http://localhost:3000"
     ],
     credentials: true
   })
@@ -55,7 +47,6 @@ const limiter = rateLimit({
 app.use("/api/", limiter)
 
 
-app.use("/public", express.static(path.join(__dirname, "public")));
 // Health check endpoint
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -82,12 +73,11 @@ app.get("/", (req, res) => {
     healthCheck: "/api/health"
   });
 });
-app.use("/api/auth", authRoutes)
-app.use("/api/dashboard", dashboardRoutes)
+
 app.use("/api/appointments", appointmentRoutes)
 app.use("/api/contact", contactRoutes)
 app.use("/api", utilityRoutes)
-app.use("/api/v1/blogs", blogRoutes)
+
 
 // Error handling middleware
 app.use(errorHandler)

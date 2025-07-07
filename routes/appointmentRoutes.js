@@ -5,7 +5,6 @@ const {
   getAppointment,
   updateAppointment,
   deleteAppointment,
-  getAppointmentStats,
 } = require("../controllers/appointmentController")
 
 const router = express.Router()
@@ -34,7 +33,6 @@ router.post("/", appointmentLimiter, validateAppointment, createAppointment)
 
 // Admin routes (would need authentication middleware in production)
 router.get("/", getAppointments)
-router.get("/stats", getAppointmentStats)
 router.get("/:id", getAppointment)
 router.put("/:id", updateAppointment)
 router.delete("/:id", deleteAppointment)

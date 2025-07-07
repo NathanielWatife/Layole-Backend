@@ -204,48 +204,10 @@ const deleteAppointment = async (req, res, next) => {
 }
 
 
-const getAppointmentStats = async (req, res, next) => {
-  try {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-    const stats = await Promise.all([
-      // Total appointments
-      Appointment.countDocuments(),
-      // Today's appointments
-      Appointment.countDocuments({
-        appointmentDate: { $gte: today, $lt: tomorrow },
-      }),
-      // Pending appointments
-      Appointment.countDocuments({ status: "pending" }),
-      // Confirmed appointments
-      Appointment.countDocuments({ status: "confirmed" }),
-      // Appointments by department
-      Appointment.aggregate([{ $group: { _id: "$department", count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
-    ])
-
-    res.json({
-      success: true,
-      data: {
-        total: stats[0],
-        today: stats[1],
-        pending: stats[2],
-        confirmed: stats[3],
-        byDepartment: stats[4],
-      },
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
 module.exports = {
   createAppointment,
   getAppointments,
   getAppointment,
   updateAppointment,
-  deleteAppointment,
-  getAppointmentStats,
+  deleteAppointment
 }

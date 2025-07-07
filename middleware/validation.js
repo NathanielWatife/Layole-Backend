@@ -13,82 +13,6 @@ const { body, validationResult } = require("express-validator")
   next()
 }
 
-// Login validation rules
-const validateLogin = [
-    body('username')
-        .trim()
-        .notEmpty().withMessage('Username or email is required'),
-    
-    body('password')
-        .trim()
-        .notEmpty().withMessage('Password is required')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
-    
-    (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                errors: errors.array()
-            });
-        }
-        next();
-    }
-];
-
-const validateProfileUpdate = [
-    body('firstName')
-        .optional()
-        .trim()
-        .notEmpty().withMessage('First name is required')
-        .isLength({ max: 50 }).withMessage('First name too long'),
-    
-    body('lastName')
-        .optional()
-        .trim()
-        .notEmpty().withMessage('Last name is required')
-        .isLength({ max: 50 }).withMessage('Last name too long'),
-    
-    body('email')
-        .optional()
-        .trim()
-        .isEmail().withMessage('Invalid email address')
-        .normalizeEmail(),
-    
-    (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                errors: errors.array()
-            });
-        }
-        next();
-    }
-];
-
-const validatePasswordChange = [
-    body('currentPassword')
-        .trim()
-        .notEmpty().withMessage('Current password is required'),
-    
-    body('newPassword')
-        .trim()
-        .notEmpty().withMessage('New password is required')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
-        .not().equals(body('currentPassword')).withMessage('New password must be different'),
-    
-    (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                errors: errors.array()
-            });
-        }
-        next();
-    }
-];
 
 // Appointment validation rules
  const validateAppointment = [
@@ -167,26 +91,8 @@ const validateContact = [
 ];
 
 
-const validateBlog = [
-  body('title')
-    .trim()
-    .notEmpty().withMessage('Title is required')
-    .isLength({ max: 120 }).withMessage('Title must be less than 120 characters'),
-  
-  body('content')
-    .trim()
-    .notEmpty().withMessage('Content is required')
-    .isLength({ min: 500 }).withMessage('Content must be at least 500 characters'),
-  
-  // ... (other validation rules from previous response)
-  handleValidationErrors
-];
 
 module.exports = {
-  validateLogin,
-  validateProfileUpdate,
-  validatePasswordChange,
   validateAppointment,
   validateContact,
-  validateBlog
 }
