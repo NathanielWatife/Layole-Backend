@@ -2,7 +2,6 @@ const express = require("express")
 const cors = require("cors")
 const helmet = require("helmet")
 const rateLimit = require("express-rate-limit")
-const morgan = require("morgan")
 require("dotenv").config()
 
 const connectDB = require("./config/db")
@@ -28,10 +27,6 @@ app.use(
   })
 );
 
-// loggin in development
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
 
 // body parsers
 app.use(express.json({ limit: "10mb" }))
