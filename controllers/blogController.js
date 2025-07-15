@@ -54,7 +54,7 @@ exports.getASinglePublishedBlog = async (req, res) =>{
 // create new blog
 exports.createABlog = async (req, res) => {
     try {
-        const { title, description, tags, body } = req.body;
+        const { title, description, tags, body, image } = req.body;
 
         // calculate the read time of the blog post
         const wpm = 225;
@@ -73,6 +73,7 @@ exports.createABlog = async (req, res) => {
             author,
             authorId,
             readTime,
+            image,
         });
 
         // add new blog to blogs array property of the user
@@ -97,11 +98,11 @@ exports.createABlog = async (req, res) => {
 
 // update a blog post
 exports.updateABlog = async (req, res) => {
-    const { title, description, body, state } = req.body;
+    const { title, description, body, state, image } = req.body;
     try {
         const blog = await Blog.findByIdAndUpdate(
             req.params.blogId,
-            {$set: { title, description, body, state }},
+            {$set: { title, description, body, state, image }},
             { new: true }
         );
         // check if blog exists
