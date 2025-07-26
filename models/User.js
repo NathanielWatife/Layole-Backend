@@ -65,10 +65,6 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
-// Method to check if password is correct
-userSchema.methods.isValidPassword = async function (currentPassword, storeUserPassword) {
-    return await bcrypt.compare(currentPassword, storeUserPassword);
-};
 
 // Use the separate connection for this model
 module.exports = blogUserConnection.model("User", userSchema);
