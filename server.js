@@ -14,7 +14,7 @@ const errorHandler = require("./middleware/errorHandler")
 
 const app = express()
 app.set('trust proxy', 1);
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT
 
 // Connect to database
 connectDB()
@@ -26,8 +26,7 @@ app.use(
   cors({
     origin: function (origin, callback) {
       const allowedOrigins = [
-        process.env.FRONTEND_URL,
-        process.env.FRONTEND_TEST
+        process.env.FRONTEND_URL
       ].filter(Boolean);
 
       // Allow requests with no origin (like mobile apps or curl requests)
@@ -65,7 +64,7 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "healthy",
     timestamp: new Date(),
-    environment: process.env.NODE_ENV || "development",
+    environment: process.env.NODE_ENV,
     database: "connected"
   });
 });
@@ -108,8 +107,7 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Hospital backend server running on port ${PORT}`)
-  console.log(`Health check: http://localhost:${PORT}/api/health`)
+  console.log(`Hospital server running....`)
 });
 
 // Handle unhandled promise rejections
