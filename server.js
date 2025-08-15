@@ -27,10 +27,9 @@ app.use(
     origin: function (origin, callback) {
       const allowedOrigins = [
         process.env.FRONTEND_URL,
-        'http://127.0.0.1:5500',
-        'http://localhost:3000',
-      ].filter(Boolean); // Remove any undefined values
-      
+        process.env.FRONTEND_TEST
+      ].filter(Boolean);
+
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
@@ -54,7 +53,7 @@ app.use(express.urlencoded({ extended: true }))
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 100, 
   message: "Too many requests from this IP, please try again later.",
   trustProxy: true
 })
@@ -67,7 +66,7 @@ app.get("/api/health", (req, res) => {
     status: "healthy",
     timestamp: new Date(),
     environment: process.env.NODE_ENV || "development",
-    database: "connected" // You could add DB ping check here
+    database: "connected"
   });
 });
 
