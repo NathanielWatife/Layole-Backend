@@ -1,20 +1,23 @@
 const mongoose = require("mongoose");
-const blogUserConnection = require('../config/blogUserDb');
+const blogUserConnection = require("../config/blogUserDb");
 
 const BlogSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
         trim: true,
+        maxlength: 200
     },
     description: {
         type: String,
         required: true,
         trim: true,
+        maxlength: 500
     },
     tags: [{
         type: String,
         trim: true,
+        maxlength: 30
     }],
     body: {
         type: String,
@@ -22,12 +25,12 @@ const BlogSchema = new mongoose.Schema({
     },
     author: {
         type: String,
+        default: "Anonymous",
         required: true,
         trim: true,
     },
     authorId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
         required: true,
     },
     image: {
