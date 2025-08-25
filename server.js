@@ -5,18 +5,25 @@ const rateLimit = require("express-rate-limit")
 require("dotenv").config()
 
 const connectDB = require("./config/db")
+const reviewDB = require("./config/reviewDb")
+const contactDB = require("./config/contactDb")
 const appointmentRoutes = require("./routes/appointmentRoutes")
 const contactRoutes = require("./routes/contactRoutes")
 const utilityRoutes = require("./routes/utilityRoutes")
 const blogRoutes = require("./routes/blogRoutes")
+const reviewRoutes = require("./routes/reviewRoutes")
 const errorHandler = require("./middleware/errorHandler")
 
 const app = express()
 app.set('trust proxy', 1);
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 
-// Connect to database
-connectDB()
+// Connect to databases
+(async () => {
+  await connectDB();
+  await reviewDB();
+  await contactDB();
+})();
 
 // Middleware
 app.use(helmet())
@@ -87,6 +94,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/appointments", appointmentRoutes)
 app.use("/api/contact", contactRoutes)
+app.use("/api/reviews", reviewRoutes)
 app.use("/api", utilityRoutes)
 app.use('/api/blogs', blogRoutes)
 
