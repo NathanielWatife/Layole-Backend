@@ -205,9 +205,19 @@ const sendContactNotification = (contactData) => {
   `;
 };
 
+const sendReviewNotification = (reviewData) => {
+    return `
+        <h1>New Review Submitted</h1>
+        <p><strong>Patient Name:</strong> ${reviewData.patientName}</p>
+        <p><strong>Email:</strong> ${reviewData.email}</p>
+        <p><strong>Comment:</strong> ${reviewData.comment}</p>
+    `;
+};
+
 module.exports = {
   sendAppointmentConfirmation,
   sendAppointmentNotification,
   sendContactConfirmation,
-  sendContactNotification
+  sendContactNotification,
+  sendReviewNotification
 };

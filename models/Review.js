@@ -4,7 +4,7 @@ const reviewDB = require('../config/reviewDb');
 const reviewSchema = new mongoose.Schema({
     patientName: {
         type: String,
-        required: [ true, 'Patient name is required'],
+        required: [true, 'Patient name is required'],
         trim: true,
         maxlength: [200, 'Patient name cannot exceed 100 characters']
     },
@@ -26,10 +26,9 @@ const reviewSchema = new mongoose.Schema({
 });
 reviewSchema.index({ rating: 1 });
 
-let Review;
-(async () => {
-  const connection = await reviewDB();
-  Review = connection.model('Review', reviewSchema);
-})();
+const getReviewModel = async () => {
+    const connection = await reviewDB();
+    return connection.model('Review', reviewSchema);
+};
 
-module.exports = Review;
+module.exports = getReviewModel;

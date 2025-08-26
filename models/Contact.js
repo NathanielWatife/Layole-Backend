@@ -27,7 +27,7 @@ const contactSchema = new mongoose.Schema({
     maxlength: [20, 'Phone number cannot exceed 20 characters']
   },
 
-  message: {
+  subject: {
     type: String,
     required: [true, 'Message is required'],
     trim: true,
@@ -51,10 +51,9 @@ const contactSchema = new mongoose.Schema({
   timestamps: true
 });
 
-let Contact;
-(async () => {
+const getContactModel = async () => {
   const connection = await contactDB();
-  Contact = connection.model('Contact', contactSchema);
-})();
+  return connection.model('Contact', contactSchema);
+};
 
-module.exports = Contact;
+module.exports = getContactModel;

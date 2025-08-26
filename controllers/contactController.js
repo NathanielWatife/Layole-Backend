@@ -1,12 +1,13 @@
 const { sendContactConfirmation, sendContactNotification } = require("../utils/emailTemplates");
 const { sendEmail } = require("../utils/sendEmail");
 const { validateContact } = require("../middleware/validation");
-const Contact = require("../models/Contact");
+const getContactModel = require("../models/Contact");
 
 const createContact = [
   validateContact,
   async (req, res, next) => {
     try {
+      const Contact = await getContactModel();
       const contactData = req.body;
 
       // save to database

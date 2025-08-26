@@ -1,10 +1,11 @@
-const Review = require("../models/Review");
+const getReviewModel = require("../models/Review");
 const { sendEmail } = require("../utils/sendEmail");
 const { sendReviewNotification } = require("../utils/emailTemplates");
 
 // create new review
 const createReview = async (req, res, next) => {
     try {
+        const Review = await getReviewModel();
         const reviewData = req.body;
 
         const review = new Review(reviewData);
@@ -33,4 +34,4 @@ const createReview = async (req, res, next) => {
 
 module.exports = {
     createReview
-}
+};

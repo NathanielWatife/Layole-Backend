@@ -86,7 +86,6 @@ const validateContact = [
   body('lastName').notEmpty().withMessage('Last name is required'),
   body('email').isEmail().withMessage('Please provide a valid email'),
   body('subject').notEmpty().withMessage('Subject is required'),
-  body('message').notEmpty().withMessage('Message is required'),
   handleValidationErrors
 ];
 
