@@ -135,7 +135,10 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-
 # Uploads
 public/uploads/*
 !public/uploads/.gitkeep
+
+# PEM files
+public.pem
+private.pem

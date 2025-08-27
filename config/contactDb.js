@@ -8,10 +8,7 @@ const contactDB = async () => {
             throw new Error(`CONTACT_DB_URI is not defined`);
         }
         if (!contactConnection) {
-            contactConnection = await mongoose.createConnection(process.env.CONTACT_DB_URI, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            });
+            contactConnection = await mongoose.createConnection(process.env.CONTACT_DB_URI);
             console.log('ContactDB Connected...');
         }
         return contactConnection;

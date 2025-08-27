@@ -39,10 +39,10 @@ const seedAdmin = async () => {
     });
 
     await superAdmin.save();
-    console.log(`Super admin created successfully:`);
-    console.log("Username");
-    console.log("Email");
-    console.log("Password");
+    console.log("Super admin created successfully");
+    console.log("Username: superAdmin.username");
+    console.log("Email: superAdmin.email");
+    console.log("Password: process.env.SUPERADMIN_PASSWORD");
 
     process.exit(0);
   } catch (error) {
@@ -53,4 +53,9 @@ const seedAdmin = async () => {
   }
 };
 
-seedAdmin();
+if (require.main === module) {
+  seedAdmin();
+}
+
+
+module.exports = seedAdmin;

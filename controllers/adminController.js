@@ -7,13 +7,20 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
+// Load the private key
+const privateKeyPath = path.resolve(__dirname, "../private.pem");
+if (!fs.existsSync(privateKeyPath)) {
+  throw new Error("Private key not found. Please generate keys first.");
+}
+const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+
 // Generate JWT Token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+  return jwt.sign({ id }, privateKey, {
+    algorithm: "RS256", // Changed to RS256 which is more standard
+    expiresIn: process.env.JWT_EXPIRES_IN || "24h",
   });
 };
-
 // Admin Login
 exports.login = async (req, res) => {
   try {

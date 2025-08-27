@@ -8,10 +8,7 @@ const reviewDB = async () => {
             throw new Error(`REVIEW_DB_URI is not defined`);
         }
         if (!reviewConnection) {
-            reviewConnection = await mongoose.createConnection(process.env.REVIEW_DB_URI, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            });
+            reviewConnection = await mongoose.createConnection(process.env.REVIEW_DB_URI);
             console.log('ReviewDB Connected...');
         }
         return reviewConnection;
