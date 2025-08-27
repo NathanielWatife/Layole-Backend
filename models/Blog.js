@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify");
 const blogUserConnection = require("../config/blogUserDb");
 
 const BlogSchema = new mongoose.Schema({
@@ -8,11 +7,6 @@ const BlogSchema = new mongoose.Schema({
         required: true,
         trim: true,
         maxlength: 200
-    },
-    slug: {
-        type: String,
-        unique: true,
-        trim: true
     },
     description: {
         type: String,
@@ -30,22 +24,12 @@ const BlogSchema = new mongoose.Schema({
         required: true,
     },
     author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Admin",
-        required: true,
-    },
-    authorName: {
         type: String,
         default: "Anonymous",
+        required: true,
         trim: true,
     },
-
     image: {
-        type: String,
-        default: "",
-        trim: true,
-    },
-    featuredImage: {
         type: String,
         default: "",
         trim: true,
@@ -63,21 +47,6 @@ const BlogSchema = new mongoose.Schema({
         enum: ["draft", "published"],
         default: "draft",
     },
-    metaTitle: {
-        type: String,
-        trim: true,
-        maxlength: 200
-    },
-    metaDescription: {
-        type: String,
-        trim: true,
-        maxlength: 300
-    },
-    state: {
-        type: String,
-        enum: ["draft", "published"],
-        default: "draft",
-    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -88,25 +57,9 @@ const BlogSchema = new mongoose.Schema({
     }
 });
 
-// generate slug from title before saving
 BlogSchema.pre("save", function(next) {
-    if (this.isModified("title") && this.title){
-        this.slug = slugify(thi.title, {
-            lower: true,
-            strict: true,
-            remove: /[*+~.()'"!:@]/g
-        });
-    }
-    if (this.isModified("title") &&  !this.metaTitle) {
-        this.metaTitle = this.title;
-    }
-
-    if (this.isModified("description") && !this.metaDescription) {
-        this.metaDescription = this.description.substring(0, 160);
-    }
-
     this.updatedAt = Date.now();
     next();
-})
+});
 
 module.exports = blogUserConnection.model("Blog", BlogSchema);
