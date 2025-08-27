@@ -3,7 +3,6 @@ const cors = require("cors")
 const helmet = require("helmet")
 const rateLimit = require("express-rate-limit")
 require("dotenv").config()
-const path = require("path");
 
 const connectDB = require("./config/db")
 const reviewDB = require("./config/reviewDb")
@@ -13,7 +12,6 @@ const contactRoutes = require("./routes/contactRoutes")
 const utilityRoutes = require("./routes/utilityRoutes")
 const blogRoutes = require("./routes/blogRoutes")
 const reviewRoutes = require("./routes/reviewRoutes")
-const adminRoutes = require("./routes/adminRoutes")
 const errorHandler = require("./middleware/errorHandler")
 
 const app = express()
@@ -57,8 +55,6 @@ app.use(
 app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
-// serve static files
-app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -102,7 +98,6 @@ app.use("/api/contact", contactRoutes)
 app.use("/api/reviews", reviewRoutes)
 app.use("/api", utilityRoutes)
 app.use('/api/blogs', blogRoutes)
-app.use("/api/admin", adminRoutes)
 
 
 // Error handling middleware
