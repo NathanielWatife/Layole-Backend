@@ -24,11 +24,16 @@ const reviewSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-reviewSchema.index({ rating: 1 });
+
 
 const getReviewModel = async () => {
-    const connection = await reviewDB();
-    return connection.model('Review', reviewSchema);
+    try {
+        const connection = await reviewDB();
+        return connection.model('Review', reviewSchema);
+    } catch {
+        console.error('Error getting review model:', error);
+        throw error;
+    }
 };
 
 module.exports = getReviewModel;

@@ -28,6 +28,7 @@ const createReview = async (req, res, next) => {
             data: review
         });
     } catch (error) {
+        consol.errpr("Error creating review:", error);
         next(error);
     }
 };
